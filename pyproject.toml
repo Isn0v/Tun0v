@@ -1,14 +1,16 @@
 [project]
 name = "bot"
 version = "0.1.0"
-description = "Telegram bot for downloading audio from YouTube"
+description = ""
 authors = [
     {name = "Isn0v",email = "isnovikov0@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "yt-dlp (>=2025.8.20,<2026.0.0)"
+    "yt-dlp (>=2025.8.20,<2026.0.0)",
+    "python-telegram-bot (>=22.3,<23.0)",
+    "validators (>=0.35.0,<0.36.0)"
 ]
 
 
