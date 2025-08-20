@@ -1,0 +1,17 @@
+[project]
+name = "bot"
+version = "0.1.0"
+description = "Telegram bot for downloading audio from YouTube"
+authors = [
+    {name = "Isn0v",email = "isnovikov0@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "yt-dlp (>=2025.8.20,<2026.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
