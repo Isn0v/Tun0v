@@ -1,6 +1,7 @@
 import yt_dlp
 
-ydl_opts = {
+
+ydl_opts_audio = {
   "outtmpl": "downloads/%(title)s.%(ext)s",
   'format': 'm4a/bestaudio/best',
   'postprocessors': [{
@@ -9,4 +10,4 @@ ydl_opts = {
   }],
 }
 
-ydl = yt_dlp.YoutubeDL(ydl_opts)
+ydl = yt_dlp.YoutubeDL(ydl_opts_audio)
