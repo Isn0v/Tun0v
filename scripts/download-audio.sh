@@ -11,7 +11,8 @@ METADATA_NAME="media"
 
 THUMBNAIL_EXT="jpg"
 
-yt-dlp --quiet --no-warnings \
+yt-dlp --no-post-overwrites \
+  --quiet --no-warnings \
   --paths "${AUDIO_PATH}" --output "${AUDIO_NAME}" \
   --embed-thumbnail --embed-metadata --add-metadata \
   -f "${AUDIO_EXT}/bestaudio/best" -o "${AUDIO_NAME}.${AUDIO_EXT}" "$1"
