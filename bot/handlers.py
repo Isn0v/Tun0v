@@ -1,58 +1,49 @@
-import time
-import utils
+import extractor
 import downloader
-import config
 
 from telegram import Update
 from telegram.ext import ContextTypes
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-  if update.message and update.effective_user:
-    reply = f'''
-Привет, {update.effective_user.first_name}. Я бот для скачивания аудио с YouTube.
-Напиши мне URL аудио, и я скачаю его.
-    '''
+  if not update.message or not update.effective_user:
+    return
     
-    await update.message.reply_text(reply)
+  reply = f'''
+Привет, {update.effective_user.first_name}. Я бот для скачивания песен с YouTube.
+Напиши мне название песни.
+  '''
+  
+  await update.message.reply_text(reply)
     
     
 async def download_audio(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await downloader.cleanup()
-  if not update.message or not update.effective_user:
+  if not update.message or not update.message.text or not update.effective_user:
     return
   
-  await update.message.reply_text('Получаю URL...')
+  query = update.message.text
   
-  url = update.message.text
-  if not url or not utils.is_valid_url(url):
-    await update.message.reply_text('Неверный URL!')
-    return
-      
-  await update.message.reply_text('Получаю информацию о аудио...')
-  
-  try:
-    await downloader.download_audio_info(url)
-    await update.message.reply_text('Информация о аудио загружена! Печатаю метаданные...')
-    
-    metadata = downloader.load_metadata()
-    output = f'''
-Название: {metadata['title']}
-Исполнитель: {metadata['artist']}
-Альбом: {metadata['album']}
-Длительность: {time.strftime('%M:%S', time.gmtime(metadata['duration']))}
-    '''
-    await update.message.reply_text(output)
-    
-    
-    await update.message.reply_text('Скачиваю аудио...')
-    await downloader.download_audio(url)
-    
-    await update.message.reply_audio(open(f'{config.AUDIO_PATH}/{config.AUDIO_NAME}.{config.AUDIO_EXT}', 'rb'))
-    await update.message.reply_text('Готово!')
-    
-  except Exception as e:
-    await update.message.reply_text(f'Error: {e}')
+  metadata = extractor.search_metadata(query, 'songs')
+  downloader.dump_metadata(metadata)
+  if not metadata:
+    await update.message.reply_text("Песня не нашлась :(")
     return
   
+  reply = "Найдена следующая песня:\n"
+  await update.message.reply_text(reply)
   
+  reply = extractor.extract_metadata(metadata, 'songs')
+  await update.message.reply_text(reply, parse_mode='MarkdownV2')
   
+  reply = "Начинаю скачивание!"
+  await update.message.reply_text(reply)
+  
+  await downloader.download_audio(extractor.format_song_url(metadata['videoId']))
+  
+  await update.message.reply_text("Скачивание завершено!")
+  await update.message.reply_audio('downloads/audio/audio.m4a',
+                                  duration=extractor.get_duration(metadata),
+                                  performer=extractor.get_performers(metadata),
+                                  title=extractor.get_title(metadata),
+                                  thumbnail=extractor.get_thumbnail_url(metadata)
+                                  )
