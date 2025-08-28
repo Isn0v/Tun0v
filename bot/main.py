@@ -1,7 +1,7 @@
-import handlers
+import bot.handlers as handlers
 
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
-from config import telegram_bot_token
+from bot.config import telegram_bot_token
 
 
 def main():
