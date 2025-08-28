@@ -27,7 +27,7 @@ file_handler = logging.handlers.RotatingFileHandler(
 
 
 formatter = logging.Formatter(
-  "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
+  "%(asctime)s [%(filename)s:%(lineno)d] %(levelname)s - %(message)s"
 )
 
 console_handler.setFormatter(formatter)
@@ -35,7 +35,3 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
-
-logger.debug(
-  f"Logging level: {log_level} ({os.getenv('LOG_LEVEL', 'INFO')})"
-)
