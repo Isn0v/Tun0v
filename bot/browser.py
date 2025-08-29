@@ -1,7 +1,7 @@
-import config
-
-from config import ytmusic
-from logger import logger
+from bot import config
+from bot.config import ytmusic
+from bot.extractor import get_browse_id
+from bot.logger import logger
 
 def search_metadata(query: str, filter: str) -> dict:
   logger.debug(f'Searching for {query} with filter {filter}')
@@ -26,8 +26,3 @@ def search_playlist_metadata(query: str) -> dict:
   
   return playlist
 
-def get_browse_id(metadata: dict) -> str:
-  logger.debug(f'Extracting browse id')
-  browse_id = metadata['browseId']
-  logger.debug(f'Extracted browse id: {browse_id}')
-  return browse_id
