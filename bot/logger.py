@@ -34,4 +34,5 @@ console_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
-logger.addHandler(file_handler)
+if os.environ.get('LOG_TO_FILE', 'false').lower() == 'true':
+  logger.addHandler(file_handler)
