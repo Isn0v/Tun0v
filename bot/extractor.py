@@ -1,7 +1,9 @@
-
 from typing import Callable
 
-from logger import logger
+from telegram.helpers import escape_markdown
+
+from bot.logger import logger
+import bot.utils as utils
 
 SONG_URL_TEMPLATE = 'https://music.youtube.com/watch?v={}'
 PLAYLIST_URL_TEMPLATE = 'https://music.youtube.com/playlist?list={}'
@@ -17,8 +19,11 @@ def extract(metadata: dict, filter: str) -> str:
 def extract_song(metadata: dict) -> str:
   logger.debug(f'Extracting song metadata')
   
-  album = get_song_album(metadata)
-  name = f'{get_song_title(metadata)} - {get_song_performers(metadata)} \\[{album}\\]'
+  album = escape_markdown(get_song_album(metadata), version=2)
+  song_title = escape_markdown(get_song_title(metadata), version=2)
+  song_performers = escape_markdown(get_song_performers(metadata), version=2)
+  
+  name = f'{song_title} \\- {song_performers} \\[{album}\\]'
   if album == "":
       name = f'{get_song_title(metadata)} - {get_song_performers(metadata)}'
 
@@ -88,7 +93,7 @@ def extract_playlist(metadata: dict) -> str:
   
   tracks = ''
   for i, song in enumerate(metadata['tracks']):
-    tracks += f'{i + 1}. {extract_song(song)}'
+    tracks += f'{i + 1}\\. {extract_song(song)}'
     
   description = get_playlist_description(metadata)
   if description:
@@ -101,6 +106,20 @@ def extract_playlist(metadata: dict) -> str:
         f'{tracks}'
   logger.debug(f'Extracted playlist metadata: {extracted}')
   return extracted
+
+def get_playlist_track_video_ids(metadata: dict) -> list[str]:
+  logger.debug(f'Extracting playlist track ids')
+  track_ids = []
+  for song in metadata['tracks']:
+    track_ids.append(get_song_video_id(song))
+  logger.debug(f'Extracted playlist track ids: {track_ids}')
+  return track_ids
+
+def get_playlist_track_metadata(metadata: dict) -> list[dict]:
+  logger.debug(f'Extracting playlist tracks metadata')
+  tracks_metadata = metadata['tracks']
+  logger.debug(f'Extracted playlist track metadata: {tracks_metadata}')
+  return tracks_metadata
 
 def get_playlist_id(metadata: dict) -> str:
   logger.debug(f'Extracting playlist id')
@@ -138,6 +157,13 @@ def format_playlist_url(playlist_id: str) -> str:
 
 
 filter_to_extractor : dict[str, Callable[[dict], str]] = {
-  'songs': extract_song,
-  'playlists': extract_playlist
+  'song': extract_song,
+  'playlist': extract_playlist
 }
+
+
+def get_browse_id(metadata: dict) -> str:
+  logger.debug(f'Extracting browse id')
+  browse_id = metadata['browseId']
+  logger.debug(f'Extracted browse id: {browse_id}')
+  return browse_id
