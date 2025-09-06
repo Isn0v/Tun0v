@@ -5,27 +5,21 @@ from bot.logger import logger
 from telegram import Update
 from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
 
-# Есть опции от 1 до какого-то натурального числа. Каждая опция состоит из двух обработчиков - получение метаданных и скачивание
-# Номера состояний в соотетсвии с номером опции:
-# Опция под номером 1 -> получение метаданных под номером 2 (так как состояния 0 и 1 заняты) и загрузка под номером 3
-# 2 -> (4, 5)
-# 3 -> (6, 7)
-# Значит, k -> (2k, 2k + 1)
-
 def prepare_conversation_handler() -> ConversationHandler:
   """
   Prepares the conversation handler for the download conversation.
 
   The conversation handler consists of the following states:
 
-  1. DOWNLOAD_START (0): The entry point of the conversation.
-  2. DOWNLOAD_OPTIONS (1): The state where the user is asked to select
+  1. DOWNLOAD_START: The entry point of the conversation.
+  2. DOWNLOAD_OPTIONS: The state where the user is asked to select
                             what to download (song or playlist).
-  3. RETRIEVE_METADATA (2k, k >= 1): The state where the metadata of the
+  3. RETRIEVE_METADATA: The state where the metadata of the
                             selected option is retrieved. 
                             Method is named as retrieve_metadata_<option_name>_state_handler
-  4. DOWNLOAD (2k + 1): The state where the selected option is downloaded. 
+  4. DOWNLOAD: The state where the selected option is downloaded. 
                             Method is named as download_<option_name>_state_handler
+  # TODO: state for choosing between search results
   5. END (reserved number): The state where the conversation ends.
 
   Returns:
@@ -60,10 +54,6 @@ async def download_start_state_handler(update: Update, context: CallbackContext)
     await update.message.reply_text(reply)
     logger.warning('No text in message')
     return STATES[HANDLER_STATE]
-  
-  if not context.user_data:
-    logger.debug('User data storage not initialized for conversation. Initializing...')
-    context.user_data = {}
 
   logger.info('Sending download options')
   options = 'Напиши цифру того, что ты хочешь скачать:\n'
@@ -136,9 +126,9 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
     await update.message.reply_text("Песня не нашлась 😥.\nДавай попробуем еще раз, но с другим запросом")
     return STATES[HANDLER_STATE]
   
-  assert context.user_data is not None, "User data is not initialized"
+  assert context.chat_data is not None, "User data is not initialized"
   logger.debug("Storing metadata into user context")
-  context.user_data['song_metadata'] = song_metadata
+  context.chat_data['song_metadata'] = song_metadata
 
   logger.debug(f"Found song with name: {extractor.get_song_title(song_metadata)}")
   reply = "Найдена следующая песня:\n"
@@ -175,10 +165,10 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
     await update.message.reply_text("Скачивание пропущено!")
     return ConversationHandler.END
 
-  assert context.user_data is not None, "User data conetxt not initialized"
-  assert 'song_metadata' in context.user_data, "Song metadata not found"
+  assert context.chat_data is not None, "User data conetxt not initialized"
+  assert 'song_metadata' in context.chat_data, "Song metadata not found"
   
-  song_metadata = context.user_data['song_metadata']
+  song_metadata = context.chat_data['song_metadata']
   logger.debug(f"Song metadata retrieved from user context")
   
   logger.info("Starting song download")
@@ -204,8 +194,6 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
     download_command
   )
   logger.info(f"Song with id {song_video_id} downloaded")
-
-  await update.message.reply_text("Скачивание завершено!")
   await update.message.reply_audio(f'{config.AUDIO_PATH}/{song_video_id}.{config.AUDIO_EXT}',
                                   title=extractor.get_song_title(song_metadata),
                                   performer=extractor.get_song_performers(song_metadata),
