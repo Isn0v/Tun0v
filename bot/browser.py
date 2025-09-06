@@ -1,13 +1,18 @@
+from typing import Callable
 from bot import config
 from bot.config import ytmusic
 from bot.extractor import get_browse_id
 from bot.logger import logger
 
+SEARCH_LIMIT = 1
+logger.debug(f"SEARCH_LIMIT: {SEARCH_LIMIT}")
+
 def search_metadata(query: str, filter: str) -> dict:
   logger.debug(f'Searching for {query} with filter {filter}')
-  metadata = config.ytmusic.search(query, filter=filter, limit=1)
+  metadata = config.ytmusic.search(query, filter=filter, limit=SEARCH_LIMIT)
   if metadata:
     logger.debug(f'Found search result for {query}')
+    # TODO: deal with all search results  
     return metadata[0]
   else:
     logger.debug(f'No search result found for {query}')
@@ -25,4 +30,3 @@ def search_playlist_metadata(query: str) -> dict:
   playlist = ytmusic.get_playlist(get_browse_id(search_result))
   
   return playlist
-
