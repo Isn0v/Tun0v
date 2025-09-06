@@ -1,23 +1,23 @@
 import yt_dlp
 import argparse
 
-import bot.config as config
+from bot.config import AUDIO_EXT, AUDIO_PATH
 
 from bot.logger import logger
 
 
 def download_songs(songs: list[str]) -> None:
   ydl_song_opts = {
-    'format': f'{config.AUDIO_EXT}/bestaudio/best',
-    'outtmpl': f'{config.AUDIO_PATH}/%(id)s.{config.AUDIO_EXT}',
+    'format': f'{AUDIO_EXT}/bestaudio/best',
+    'outtmpl': f'{AUDIO_PATH}/%(id)s.{AUDIO_EXT}',
   }
   ydl = yt_dlp.YoutubeDL(ydl_song_opts)
   ydl.download(songs)
   
 def download_playlist(playlist_url: str) -> None:
   ydl_playlist_opts = {
-    'format': f'{config.AUDIO_EXT}/bestaudio/best',
-    'outtmpl': f'{config.AUDIO_PATH}/%(playlist_id)s/%(id)s.{config.AUDIO_EXT}',
+    'format': f'{AUDIO_EXT}/bestaudio/best',
+    'outtmpl': f'{AUDIO_PATH}/%(playlist_id)s/%(id)s.{AUDIO_EXT}',
   }
   ydl = yt_dlp.YoutubeDL(ydl_playlist_opts)
   
