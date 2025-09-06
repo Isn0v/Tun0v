@@ -9,7 +9,7 @@ STDERR_REDIRECT = sys.stderr
 # TODO: limit the number of subprocesses if needed
   
 async def invoke_async_subprocess(command: str, args: str) -> None:
-  logger.info(f'Running async command: {command}')
+  logger.info(f'Running async command: {command} {args}')
   process = await asyncio.create_subprocess_exec(
     command,
     *args.split(),
