@@ -8,12 +8,8 @@ import bot.utils as utils
 SONG_URL_TEMPLATE = 'https://music.youtube.com/watch?v={}'
 PLAYLIST_URL_TEMPLATE = 'https://music.youtube.com/playlist?list={}'
 
+
 # TODO: extract method must be async
-def extract(metadata: dict, filter: str) -> str:
-  logger.debug(f'Extracting metadata with filter {filter}')
-  extractor = filter_to_extractor[filter]
-  
-  return extractor(metadata)
 
 # region Song Metadata Extraction
 def extract_song(metadata: dict) -> str:
@@ -154,12 +150,6 @@ def format_playlist_url(playlist_id: str) -> str:
   logger.debug(f'Formatted playlist url: {playlist_url}')
   return playlist_url
 # endregion
-
-
-filter_to_extractor : dict[str, Callable[[dict], str]] = {
-  'song': extract_song,
-  'playlist': extract_playlist
-}
 
 
 def get_browse_id(metadata: dict) -> str:
