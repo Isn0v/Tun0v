@@ -2,7 +2,8 @@ from typing import Optional
 from telegram import InputMediaAudio, Update
 from telegram.ext import ContextTypes, CallbackContext, ConversationHandler
 
-from bot.handlers.download_conversation import DOWNLOAD_OPTIONS, STATES
+from bot.handlers.dl_convo.constants import STATES
+from bot.handlers.dl_convo.constants import DOWNLOAD_OPTIONS
 from bot.logger import logger
 
 
