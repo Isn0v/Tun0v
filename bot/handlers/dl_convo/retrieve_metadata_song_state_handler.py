@@ -1,5 +1,5 @@
 from bot import browser, extractor
-from bot.handlers.dl_convo.constants import STATES
+from bot.handlers.constants import STATES
 from bot.logger import logger
 
 

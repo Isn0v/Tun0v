@@ -1,5 +1,5 @@
 from bot import browser, config, extractor, subproc
-from bot.handlers.dl_convo.constants import DOWNLOAD_OPTIONS, PLAYLIST_LIMIT, STATES
+from bot.handlers.constants import DOWNLOAD_OPTIONS, PLAYLIST_LIMIT, STATES
 from bot.handlers.dl_convo.download_option_state_handler import download_option_state_handler
 from bot.handlers.dl_convo.download_song_state_handler import download_song_state_handler
 from bot.handlers.dl_convo.download_start_state_handler import download_start_state_handler

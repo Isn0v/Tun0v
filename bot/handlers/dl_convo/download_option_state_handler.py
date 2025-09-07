@@ -1,5 +1,5 @@
-from bot.handlers.dl_convo.constants import STATES
-from bot.handlers.dl_convo.constants import DOWNLOAD_OPTIONS
+from bot.handlers.constants import STATES
+from bot.handlers.constants import DOWNLOAD_OPTIONS
 from bot.logger import logger
 
 
