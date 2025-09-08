@@ -2,8 +2,6 @@ from typing import Optional
 from telegram import InputMediaAudio, Update
 from telegram.ext import ContextTypes, CallbackContext, ConversationHandler
 
-from bot.handlers.constants import STATES
-from bot.handlers.constants import DOWNLOAD_OPTIONS
 from bot.logger import logger
 
 
@@ -18,7 +16,7 @@ async def start(update: Update, context: CallbackContext) -> int:
   '''
   await update.message.reply_text(reply)
 
-  return STATES[0]
+  return 0
 
 
 # Just for testing. Never mind
