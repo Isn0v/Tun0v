@@ -1,5 +1,9 @@
 from bot import browser, config, extractor, subproc
-from bot.handlers.constants import DOWNLOAD_OPTIONS, PLAYLIST_LIMIT, STATES
+from bot.handlers.dl_convo.constants import PLAYLIST_LIMIT
+from bot.handlers.dl_convo.constants import DOWNLOAD_START_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_OPTION_STATE
+from bot.handlers.dl_convo.constants import RETRIEVE_METADATA_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_SONG_STATE
 from bot.handlers.dl_convo.download_option_state_handler import download_option_state_handler
 from bot.handlers.dl_convo.download_song_state_handler import download_song_state_handler
 from bot.handlers.dl_convo.download_start_state_handler import download_start_state_handler
@@ -35,10 +39,10 @@ def prepare_conversation_handler() -> ConversationHandler:
   return ConversationHandler(
     entry_points=[CommandHandler('start', download_start_state_handler)],
     states={
-      STATES[0]: [MessageHandler(filters.TEXT, download_start_state_handler)],
-      STATES[1]: [MessageHandler(filters.TEXT, download_option_state_handler)],
-      STATES[2]: [MessageHandler(filters.TEXT, retrieve_metadata_song_state_handler)],
-      STATES[3]: [MessageHandler(filters.TEXT, download_song_state_handler)],
+      DOWNLOAD_START_STATE: [MessageHandler(filters.TEXT, download_start_state_handler)],
+      DOWNLOAD_OPTION_STATE: [MessageHandler(filters.TEXT, download_option_state_handler)],
+      RETRIEVE_METADATA_STATE: [MessageHandler(filters.TEXT, retrieve_metadata_song_state_handler)],
+      DOWNLOAD_SONG_STATE: [MessageHandler(filters.TEXT, download_song_state_handler)],
     },
     fallbacks=[CommandHandler('cancel', cancel_handler)],
   )
@@ -47,7 +51,7 @@ def prepare_conversation_handler() -> ConversationHandler:
 async def download_playlist_state_handler(update: Update, context: CallbackContext) -> int:
   logger.info('Entering the download playlist handler')
 
-  HANDLER_STATE = 3
+  HANDLER_STATE = 4
   logger.debug(f"HANDLER_STATE: {HANDLER_STATE}")
 
   logger.info("Cleaning up")
@@ -64,7 +68,12 @@ async def download_playlist_state_handler(update: Update, context: CallbackConte
     logger.warning('No text in message')
     reply = "Возникла какая-то ошибка с сообщением.\n Напиши еще раз, какой плэйлист ты хочешь скачать"
     await update.message.reply_text(reply)
-    return STATES[HANDLER_STATE]
+    return HANDLER_STATE
+  
+  reply = 'Данная функция пока не реализована 😥\n \
+            Приходите позже'
+  await update.message.reply_text(reply)
+  return ConversationHandler.END
 
   query = update.message.text
   logger.info(f"Searching for playlist with query: {query}")
@@ -83,7 +92,6 @@ async def download_playlist_state_handler(update: Update, context: CallbackConte
   reply = extractor.extract_playlist(playlist_metadata)
   await update.message.reply_text(reply, parse_mode='MarkdownV2')
 
-  return ConversationHandler.END
 
   # TODO: deal with errors from async subprocess and handle them gracefully (maybe don't download tracks as playlist, but as single ones?)
   logger.info("Retrieving playlist track ids")
@@ -143,4 +151,5 @@ async def download_playlist_state_handler(update: Update, context: CallbackConte
 
 async def cancel_handler(update: Update, context: CallbackContext) -> int:
   logger.info('Leaving the conversation')
+  # TODO setup a reply from with basic markup
   return ConversationHandler.END

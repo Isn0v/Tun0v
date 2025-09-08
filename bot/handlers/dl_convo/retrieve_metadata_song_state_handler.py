@@ -1,5 +1,6 @@
 from bot import browser, extractor
-from bot.handlers.constants import STATES
+from bot.handlers.dl_convo.constants import RETRIEVE_METADATA_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_SONG_STATE
 from bot.logger import logger
 
 
@@ -21,7 +22,7 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
     logger.warning('No text in message')
     reply = "Возникла какая-то ошибка с сообщением. Напиши еще раз, какую песню ты хочешь скачать"
     await update.message.reply_text(reply)
-    return STATES[HANDLER_STATE]
+    return RETRIEVE_METADATA_STATE
 
   query = update.message.text
   logger.info(f"Searching for song with query: {query}")
@@ -32,7 +33,7 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
     logger.warning(f"Song with query {query} not found")
     await update.message.reply_text("Песня не нашлась 😥.\n \
                                     Давай попробуем еще раз, но с другим запросом")
-    return STATES[HANDLER_STATE]
+    return RETRIEVE_METADATA_STATE
 
   assert context.chat_data is not None, "User data is not initialized"
   logger.debug("Storing metadata into user context")
@@ -55,4 +56,6 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
   reply = 'Скачиваем? 🤔'
   await update.message.reply_text(reply, reply_markup=markup)
 
-  return STATES[HANDLER_STATE + 1]
+  return DOWNLOAD_SONG_STATE
+
+

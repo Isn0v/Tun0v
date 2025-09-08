@@ -1,5 +1,5 @@
-from bot.handlers.constants import STATES
-from bot.handlers.constants import DOWNLOAD_OPTIONS
+from bot.handlers.dl_convo.constants import DOWNLOAD_OPTIONS, DOWNLOAD_START_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_OPTION_STATE
 from bot.logger import logger
 
 
@@ -21,7 +21,7 @@ async def download_start_state_handler(update: Update, context: CallbackContext)
     reply = "Возникла какая-то ошибка с сообщением. Давай начнем сначала"
     await update.message.reply_text(reply)
     logger.warning('No text in message')
-    return STATES[HANDLER_STATE]
+    return DOWNLOAD_START_STATE
 
   logger.info('Sending download options')
   options = 'Выбери, что ты хочешь скачать:\n'
@@ -33,4 +33,6 @@ async def download_start_state_handler(update: Update, context: CallbackContext)
   markup = ReplyKeyboardMarkup([buttons], resize_keyboard=True, one_time_keyboard=True)
   await update.message.reply_text(options, reply_markup=markup)
 
-  return STATES[HANDLER_STATE + 1]
+  return DOWNLOAD_OPTION_STATE
+
+
