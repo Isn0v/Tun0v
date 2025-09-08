@@ -1,5 +1,5 @@
-from bot.handlers.dl_convo.constants import DOWNLOAD_OPTIONS, DOWNLOAD_START_STATE
-from bot.handlers.dl_convo.constants import DOWNLOAD_OPTION_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_OPTIONS, DOWNLOAD_START_STATE, DOWNLOAD_OPTION_STATE
+
 from bot.logger import logger
 
 
@@ -9,9 +9,6 @@ from telegram.ext import CallbackContext, ConversationHandler
 
 async def download_start_state_handler(update: Update, context: CallbackContext) -> int:
   logger.info('Entering the download start handler')
-
-  HANDLER_STATE = 0
-  logger.debug(f"HANDLER_STATE: {HANDLER_STATE}")
 
   if not update.message or not update.effective_user:
     logger.error('Incorrect state of user or message for download start handler. Quitting the conversation...')

@@ -1,6 +1,6 @@
 from bot import browser, extractor
-from bot.handlers.dl_convo.constants import RETRIEVE_METADATA_STATE
-from bot.handlers.dl_convo.constants import DOWNLOAD_SONG_STATE
+from bot.handlers.dl_convo.utils import get_starter_markup_reply
+from bot.handlers.dl_convo.constants import RETRIEVE_METADATA_STATE, DOWNLOAD_SONG_STATE
 from bot.logger import logger
 
 
@@ -10,9 +10,6 @@ from telegram.ext import CallbackContext, ConversationHandler
 
 async def retrieve_metadata_song_state_handler(update: Update, context: CallbackContext) -> int:
   logger.info('Entering the retrieve metadata song handler')
-
-  HANDLER_STATE = 2
-  logger.debug(f"HANDLER_STATE: {HANDLER_STATE}")
 
   if not update.message or not update.effective_user:
     logger.error('Incorrect state of user or message for download song handler. Quitting the conversation...')

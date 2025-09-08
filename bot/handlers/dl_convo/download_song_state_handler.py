@@ -1,7 +1,8 @@
 from bot import config, extractor, subproc
-from bot.handlers.dl_convo.constants import DOWNLOAD_START_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_START_STATE, DOWNLOAD_SONG_STATE
+from bot.handlers.dl_convo.utils import get_starter_markup_reply
+
 from bot.logger import logger
-from bot.handlers.dl_convo.constants import DOWNLOAD_SONG_STATE 
 
 from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
@@ -9,9 +10,6 @@ from telegram.ext import CallbackContext, ConversationHandler
 
 async def download_song_state_handler(update: Update, context: CallbackContext) -> int:
   logger.info('Entering the download song handler')
-
-  HANDLER_STATE = 3
-  logger.debug(f"HANDLER_STATE: {HANDLER_STATE}")
 
   if not update.message or not update.effective_user:
     logger.error('Incorrect state of user or message for download song handler. Quitting the conversation...')
@@ -26,7 +24,7 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
   answer = update.message.text.lower()
   if answer != 'да':
     logger.info("Skipping song download")
-    await update.message.reply_text("Скачивание пропущено ⏩")
+    await update.message.reply_text("Скачивание пропущено ⏩", reply_markup=get_starter_markup_reply())
     return ConversationHandler.END
 
   assert context.chat_data is not None, "User data conetxt not initialized"
@@ -80,5 +78,5 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
                                   )
   logger.info(f"Song with id {song_video_id} sent")
 
-  await update.message.reply_text("Скачивание завершено ✅")
+  await update.message.reply_text("Скачивание завершено ✅", reply_markup=get_starter_markup_reply())
   return ConversationHandler.END
