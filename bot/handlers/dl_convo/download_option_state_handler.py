@@ -3,7 +3,7 @@ from bot.handlers.constants import DOWNLOAD_OPTIONS
 from bot.logger import logger
 
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
 
@@ -21,24 +21,16 @@ async def download_option_state_handler(update: Update, context: CallbackContext
     logger.warning('No text in message')
     reply = "Возникла какая-то ошибка с сообщением. Давай начнем сначала"
     await update.message.reply_text(reply)
-    return STATES[1]
-
-  user_response = update.message.text.lower()
-  logger.info(f'User response is {user_response}')
-  chosen_number = -1
-  try:
-    chosen_number = int(user_response)
-    if chosen_number < 1 or chosen_number > len(DOWNLOAD_OPTIONS):
-      raise ValueError(f'Chosen number {chosen_number} is out of range or incorrect')
-  except ValueError as e:
-    logger.warning(f'Error parsing user response {user_response}: {e}')
-    await update.message.reply_text("Введен некорректный вариант. Давай еще раз")
     return STATES[HANDLER_STATE]
 
-  assert chosen_number != -1, "Chosen number is not set"
-  logger.info(f'Chosen state number is {chosen_number}')
+  user_response = update.message.text
+  logger.info(f'User option response is {user_response}')
 
-  reply = f'Теперь тебе нужно ввести название для поиска'
-  await update.message.reply_text(reply)
+  # TODO: search song by download url
+  reply = f'Введи название песни 🌐'
+  await update.message.reply_text(reply, reply_markup=ReplyKeyboardRemove())
 
-  return STATES[2*chosen_number]
+  option_number = DOWNLOAD_OPTIONS.index(user_response) + 1
+  state_number = 2*option_number
+  logger.info(f'User option number is {option_number}. Setting state to {state_number}')
+  return STATES[state_number]

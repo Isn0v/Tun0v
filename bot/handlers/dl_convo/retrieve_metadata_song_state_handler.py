@@ -3,7 +3,7 @@ from bot.handlers.constants import STATES
 from bot.logger import logger
 
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import CallbackContext, ConversationHandler
 
 
@@ -30,7 +30,8 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
   song_metadata = browser.search_song_metadata(query)
   if not song_metadata:
     logger.warning(f"Song with query {query} not found")
-    await update.message.reply_text("Песня не нашлась 😥.\nДавай попробуем еще раз, но с другим запросом")
+    await update.message.reply_text("Песня не нашлась 😥.\n \
+                                    Давай попробуем еще раз, но с другим запросом")
     return STATES[HANDLER_STATE]
 
   assert context.chat_data is not None, "User data is not initialized"
@@ -44,8 +45,14 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
   logger.debug(f"Extracting song metadata")
   reply = extractor.extract_song(song_metadata)
   await update.message.reply_text(reply, parse_mode='MarkdownV2')
+  
+  markup = ReplyKeyboardMarkup(
+    [['Да', 'Нет']],
+    resize_keyboard=True,
+    one_time_keyboard=True
+  )
 
-  reply = 'Скачиваем? Да/Нет'
-  await update.message.reply_text(reply)
+  reply = 'Скачиваем? 🤔'
+  await update.message.reply_text(reply, reply_markup=markup)
 
   return STATES[HANDLER_STATE + 1]

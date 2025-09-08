@@ -3,7 +3,7 @@ from bot.handlers.constants import STATES
 from bot.logger import logger
 
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
 
@@ -26,7 +26,7 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
   answer = update.message.text.lower()
   if answer != 'да':
     logger.info("Skipping song download")
-    await update.message.reply_text("Скачивание пропущено!")
+    await update.message.reply_text("Скачивание пропущено ⏩")
     return ConversationHandler.END
 
   assert context.chat_data is not None, "User data conetxt not initialized"
@@ -46,8 +46,8 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
 
   song_video_id = extractor.get_song_video_id(song_metadata)
   logger.info(f"Downloading song with id {song_video_id}")
-  reply = "Начинаю скачивание!"
-  await update.message.reply_text(reply)
+  reply = "Начинаю скачивание ⬇️"
+  await update.message.reply_text(reply, reply_markup=ReplyKeyboardRemove())
 
   song_url = extractor.format_song_url(song_video_id)
   logger.debug(f"Song url: {song_url}")
@@ -66,5 +66,5 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
                                   )
   logger.info(f"Song with id {song_video_id} sent")
 
-  await update.message.reply_text("Скачивание завершено!")
+  await update.message.reply_text("Скачивание завершено ✅")
   return ConversationHandler.END
