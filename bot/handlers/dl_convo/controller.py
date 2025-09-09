@@ -1,18 +1,17 @@
-from bot.handlers.dl_convo.constants import (CANCEL_DOWNLOAD_COMMAND, DOWNLOAD_START_STATE,
+from bot.handlers.dl_convo.cancel_handler import cancel_handler
+from bot.handlers.dl_convo.constants import (FALLBACK_DOWNLOAD_CONVERSATION_COMMAND, DOWNLOAD_START_STATE,
                                             DOWNLOAD_OPTION_STATE,
                                             RETRIEVE_METADATA_STATE,
                                             DOWNLOAD_SONG_STATE,
-                                            START_DOWNLOAD_COMMAND)
+                                            START_DOWNLOAD_CONVERSATION_COMMAND)
 
 from bot.handlers.dl_convo.download_option_state_handler import download_option_state_handler
 from bot.handlers.dl_convo.download_song_state_handler import download_song_state_handler
 from bot.handlers.dl_convo.download_start_state_handler import download_start_state_handler
 from bot.handlers.dl_convo.retrieve_metadata_song_state_handler import retrieve_metadata_song_state_handler
 
-from bot.logger import logger
 
-from telegram import Update
-from telegram.ext import CallbackContext, ConversationHandler, CommandHandler, MessageHandler, filters
+from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, filters
 
 
 def prepare_conversation_handler() -> ConversationHandler:
@@ -38,18 +37,14 @@ def prepare_conversation_handler() -> ConversationHandler:
 
   # TODO: playlist option
   return ConversationHandler(
-    entry_points=[CommandHandler(START_DOWNLOAD_COMMAND, download_start_state_handler)],
+    entry_points=[CommandHandler(START_DOWNLOAD_CONVERSATION_COMMAND, download_start_state_handler)],
     states={
       DOWNLOAD_START_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, download_start_state_handler)],
       DOWNLOAD_OPTION_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, download_option_state_handler)],
       RETRIEVE_METADATA_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, retrieve_metadata_song_state_handler)],
       DOWNLOAD_SONG_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, download_song_state_handler)],
     },
-    fallbacks=[CommandHandler(CANCEL_DOWNLOAD_COMMAND, cancel_handler)],
+    fallbacks=[CommandHandler(FALLBACK_DOWNLOAD_CONVERSATION_COMMAND, cancel_handler)],
   )
 
 
-async def cancel_handler(update: Update, context: CallbackContext) -> int:
-  logger.info('Leaving the conversation')
-  # TODO setup a reply from with basic markup
-  return ConversationHandler.END
