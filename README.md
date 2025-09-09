@@ -22,8 +22,7 @@
 Запускаете докер контейнер c импортом файла переменных окружения (для изучения конкретных переменных окружение смотрите в [env.list](env.list))
 
 ```bash
-  cd $REPO_ROOT 
-  sudo docker run --env-file ./env.list isnov/tun0v:latest
+  sudo docker run --env-file ./env.list --restart unless-stopped isnov/tun0v:latest
 ```
 
 ## ✅ Текущие доступные возможности
