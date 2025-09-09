@@ -1,6 +1,5 @@
 from bot import browser, extractor
-from bot.handlers.dl_convo.utils import get_starter_markup_reply
-from bot.handlers.dl_convo.constants import RETRIEVE_METADATA_STATE, DOWNLOAD_SONG_STATE
+from bot.handlers.dl_convo.constants import RETRIEVE_METADATA_STATE, DOWNLOAD_SONG_STATE, FALLBACK_DOWNLOAD_CONVERSATION_COMMAND
 from bot.logger import logger
 
 
@@ -28,8 +27,8 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
   song_metadata = browser.search_song_metadata(query)
   if not song_metadata:
     logger.warning(f"Song with query {query} not found")
-    await update.message.reply_text("Песня не нашлась 😥.\n \
-                                    Давай попробуем еще раз, но с другим запросом")
+    await update.message.reply_text("Песня не нашлась 😥.\n' + \
+                                    'Давай попробуем еще раз, но с другим запросом")
     return RETRIEVE_METADATA_STATE
 
   assert context.chat_data is not None, "User data is not initialized"
@@ -45,7 +44,8 @@ async def retrieve_metadata_song_state_handler(update: Update, context: Callback
   await update.message.reply_text(reply, parse_mode='MarkdownV2')
   
   markup = ReplyKeyboardMarkup(
-    [['Да', 'Нет']],
+    # TODO: buttons 'Другой запрос' and 'Следующий результат'
+    [['Да', 'Нет'], [f'/{FALLBACK_DOWNLOAD_CONVERSATION_COMMAND}']],
     resize_keyboard=True,
     one_time_keyboard=True
   )

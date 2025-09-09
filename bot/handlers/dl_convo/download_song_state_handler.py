@@ -1,10 +1,10 @@
 from bot import config, extractor, subproc
-from bot.handlers.dl_convo.constants import DOWNLOAD_START_STATE, DOWNLOAD_SONG_STATE
+from bot.handlers.dl_convo.constants import DOWNLOAD_START_STATE, DOWNLOAD_SONG_STATE, FALLBACK_DOWNLOAD_CONVERSATION_COMMAND
 from bot.handlers.dl_convo.utils import get_starter_markup_reply
 
 from bot.logger import logger
 
-from telegram import Update, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, Update, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, ConversationHandler
 
 
@@ -64,9 +64,15 @@ async def download_song_state_handler(update: Update, context: CallbackContext) 
   except RuntimeError as e:
     # TODO: maybe handle better?
     logger.error(f"Downloading song with id {song_video_id} failed with error: {e}")
-    reply = "Возникла какая-то ошибка с скачиванием 😥\n \
-            Попробуй сначала"
-    await update.message.reply_text(reply)
+    reply = "Возникла какая-то ошибка с скачиванием 😥\n" + \
+            "Давай попробуем еще раз"
+    buttons = [['Давай!']]
+    markup = ReplyKeyboardMarkup(
+      buttons,
+      resize_keyboard=True,
+      one_time_keyboard=True
+    )
+    await update.message.reply_text(reply, reply_markup=markup)
     return DOWNLOAD_START_STATE
     
   logger.info(f"Song with id {song_video_id} downloaded")
