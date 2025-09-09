@@ -10,6 +10,15 @@ STDERR_REDIRECT = asyncio.subprocess.PIPE
 LOG_SUBPROCESSES = os.environ.get('LOG_SUBPROCESSES', 'false')
 logger.debug(f"LOG_SUBPROCESSES: {LOG_SUBPROCESSES}")
 
+async def log_subprocess_stream(stream: asyncio.StreamReader, logger_function) -> None:
+  while True:
+    stdout_line = await stream.readline()
+    if stdout_line:
+      stdout_line = stdout_line.rstrip(b'\n')
+    if not stdout_line:
+      break
+    logger_function(stdout_line.decode('utf-8'))
+
 
 # TODO: limit the number of subprocesses if needed
   
@@ -24,20 +33,13 @@ async def invoke_async_subprocess(command: str, args: str) -> None:
     env=os.environ.copy()
   )
   
-  stdout, stderr = await process.communicate()
+  if process.stdout:
+    await log_subprocess_stream(process.stdout, logger.debug)
+  if process.stderr:
+    await log_subprocess_stream(process.stderr, logger.error)
   
-  script_name = os.path.basename(args_array[0])
-  
-  logger.debug(f'Command {command} {args} exited with code {process.returncode}')
-  if LOG_SUBPROCESSES == 'true':
-    with open(f'{LOG_PATH}/{script_name}.log', 'a') as f:
-      logger.debug(f'Dumping subprocess stdout to {f.name}')
-      f.write(stdout.decode('utf-8'))
+  await process.communicate()
   
   if process.returncode != 0:
     logger.error(f'Command {command} {args} failed')
-    if LOG_SUBPROCESSES == 'true':
-      with open(f'{LOG_PATH}/{script_name}.log', 'a') as f:
-        logger.debug(f'Dumping subprocess stderr to {f.name}')
-        f.write(stderr.decode('utf-8'))
     raise RuntimeError(f'Command {command} {args} failed')
