@@ -5,20 +5,38 @@ from bot.config import AUDIO_EXT, AUDIO_PATH
 
 from bot.logger import logger
 
+default_ydl_opts = {
+  'format': f'{AUDIO_EXT}/bestaudio/best',
+  'outtmpl': {
+    'default': 'TO_BE_OVERRIDEN', 
+    'pl_thumbnail': ''
+    },
+  'postprocessors': [{
+                      'add_chapters': True,
+                      'add_infojson': 'if_exists',
+                      'add_metadata': True,
+                      'key': 'FFmpegMetadata'
+                    },
+                    {
+                      'already_have_thumbnail': False, 
+                      'key': 'EmbedThumbnail'
+                    }],
+  'writethumbnail': True
+}
+
+
 
 def download_songs(songs: list[str]) -> None:
-  ydl_song_opts = {
-    'format': f'{AUDIO_EXT}/bestaudio/best',
-    'outtmpl': f'{AUDIO_PATH}/%(id)s.{AUDIO_EXT}',
-  }
+  ydl_song_opts = default_ydl_opts.copy()
+  ydl_song_opts['outtmpl']['default'] = f'{AUDIO_PATH}/%(id)s.{AUDIO_EXT}'
+  
   ydl = yt_dlp.YoutubeDL(ydl_song_opts)
   ydl.download(songs)
   
 def download_playlist(playlist_url: str) -> None:
-  ydl_playlist_opts = {
-    'format': f'{AUDIO_EXT}/bestaudio/best',
-    'outtmpl': f'{AUDIO_PATH}/%(playlist_id)s/%(id)s.{AUDIO_EXT}',
-  }
+  ydl_playlist_opts = default_ydl_opts.copy()
+  ydl_playlist_opts['outtmpl']['default'] = f'{AUDIO_PATH}/%(playlist_id)s/%(id)s.{AUDIO_EXT}',
+  
   ydl = yt_dlp.YoutubeDL(ydl_playlist_opts)
   
   ydl.download([playlist_url])
