@@ -27,6 +27,7 @@ default_ydl_opts = {
 
 
 def download_songs(songs: list[str]) -> None:
+  logger.info(f'Downloading songs: {songs}')
   ydl_song_opts = default_ydl_opts.copy()
   ydl_song_opts['outtmpl']['default'] = f'{AUDIO_PATH}/%(id)s.{AUDIO_EXT}'
   
@@ -34,6 +35,7 @@ def download_songs(songs: list[str]) -> None:
   ydl.download(songs)
   
 def download_playlist(playlist_url: str) -> None:
+  logger.info(f'Fownloading playlist: {playlist_url}')
   ydl_playlist_opts = default_ydl_opts.copy()
   ydl_playlist_opts['outtmpl']['default'] = f'{AUDIO_PATH}/%(playlist_id)s/%(id)s.{AUDIO_EXT}',
   
