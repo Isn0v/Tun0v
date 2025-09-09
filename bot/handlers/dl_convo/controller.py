@@ -40,10 +40,10 @@ def prepare_conversation_handler() -> ConversationHandler:
   return ConversationHandler(
     entry_points=[CommandHandler(START_DOWNLOAD_COMMAND, download_start_state_handler)],
     states={
-      DOWNLOAD_START_STATE: [MessageHandler(filters.TEXT, download_start_state_handler)],
-      DOWNLOAD_OPTION_STATE: [MessageHandler(filters.TEXT, download_option_state_handler)],
-      RETRIEVE_METADATA_STATE: [MessageHandler(filters.TEXT, retrieve_metadata_song_state_handler)],
-      DOWNLOAD_SONG_STATE: [MessageHandler(filters.TEXT, download_song_state_handler)],
+      DOWNLOAD_START_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, download_start_state_handler)],
+      DOWNLOAD_OPTION_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, download_option_state_handler)],
+      RETRIEVE_METADATA_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, retrieve_metadata_song_state_handler)],
+      DOWNLOAD_SONG_STATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, download_song_state_handler)],
     },
     fallbacks=[CommandHandler(CANCEL_DOWNLOAD_COMMAND, cancel_handler)],
   )
